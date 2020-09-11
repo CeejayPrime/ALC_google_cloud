@@ -1,0 +1,89 @@
+Getting Started with Deployment Manager and Cloud Monitoring
+
+After logging in to cloud console, open cloud shell
+
+Export the zone using this command
+export MY_ZONE=us-central1-a
+
+Download an editable Deployment Manager template with this command
+gsutil cp gs://cloud-training/gcpfcoreinfra/mydeploy.yaml mydeploy.yaml
+
+Use the sed command to replace the PROJECT_ID placeholder string with your Google Cloud Platform project ID using this command
+sed -i -e "s/PROJECT_ID/$DEVSHELL_PROJECT_ID/" mydeploy.yaml
+
+Replace the ZONE placeholder string with your Google Cloud Platform zone also with the sed command
+sed -i -e "s/ZONE/$MY_ZONE/" mydeploy.yaml
+
+View the deploy.yaml file with this command
+cat mydeploy.yaml
+
+Build a deployment from the template
+  gcloud deployment-manager deployments create my-first-depl --config mydeploy.yaml
+
+Confirm if the deployment was successful by going to cloud console > compute engine > vm instances and see if my-vm was created,
+Then, scroll down to the Custom metadata section. Confirm that the startup script you specified in your Deployment Manager template has been installed.
+
+Launch the nano editor on cloud shell to edit mydeploy.yaml with this command
+  nano mydeploy.yaml
+
+Replace the lines having this value: 'value: "apt-get update"' with: 'value: "apt-get update; apt-get install nginx-light -y"'
+Before replacing the line, take note of the indentation, make sure not to change it.
+
+Press Ctrl + O and enter to save, and Ctrl + X to exit
+
+View the Load on a VM using Cloud Monitoring
+
+Go to the cloud console > Compute Engine > VM instances and SSH into my-vm
+
+In the ssh session on my-vm, execute this command to create a CPU load
+  dd if=/dev/urandom | gzip -9 >> /dev/null &
+
+Create a Monitoring workspace
+First set up monitoring workspace. After workspace have been created, go to settings > agents
+
+Install agents on your running vms (Monitoring agents and logging agents)
+
+Add the agent's package repository
+  curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
+  sudo bash add-monitoring-agent-repo.sh
+  sudo apt-get update
+
+Install the agent
+Run this command to get the latest version of the agent
+  sudo apt-get install stackdriver-agent
+  
+Start the agent service
+  sudo service stackdriver-agent start
+
+To verify that the agent is working as expected, run
+  sudo service stackdriver-agent status
+  
+Install the logging agent
+Still on the SSH session of my-vm
+
+Add the agent's package repository
+  curl -sSO https://dl.google.com/cloudagents/add-logging-agent-repo.sh
+  sudo bash add-logging-agent-repo.sh
+  sudo apt-get update
+  
+Install the agent
+   sudo apt-get install google-fluentd
+
+For structured logging, run
+  sudo apt-get install -y google-fluentd-catch-all-config-structured
+  
+Start the agent service
+  sudo service google-fluentd start
+  
+To verify that the agent is working as expected, run
+  sudo service google-fluentd status
+  
+Once both of the agents have been installed on your project's VM, click Metrics Explorer under the main Cloud Monitoring menu on the far left
+
+In the Metric pane of Metrics Explorer, select the resource type GCE VM instance and the metric CPU usage.
+
+In the resulting graph, notice that CPU usage increased sharply a few minutes ago
+
+Terminate the workload generator from the SSH session of my-vm with this command
+  kill %1
+  
