@@ -1,24 +1,24 @@
 Create a networt called privatenet
-gcloud compute networks create privatenet --subnet-mode=custom
+  gcloud compute networks create privatenet --subnet-mode=custom
 
 To create the privatesubnet-us subnet, run the following command
-gcloud compute networks subnets create privatesubnet-us --network=privatenet --region=us-central1 --range=172.16.0.0/24
+  gcloud compute networks subnets create privatesubnet-us --network=privatenet --region=us-central1 --range=172.16.0.0/24
 
 To list all available networks, use:
-gcloud compute networks list
+  gcloud compute networks list
 
 List available subnets
-gcloud compute networks subnets list --sort-by=NETWORK
+  gcloud compute networks subnets list --sort-by=NETWORK
 
 Create Firewall Rule
-gcloud compute firewall-rules create privatenet-allow-icmp-ssh-rdp --direction=INGRESS --priority=1000 --network=privatenet --action=ALLOW
---rules=icmp,tcp:22,tcp:3389 --source-ranges=0.0.0.0/0
+  gcloud compute firewall-rules create privatenet-allow-icmp-ssh-rdp --direction=INGRESS --priority=1000 --network=privatenet --action=ALLOW
+  --rules=icmp,tcp:22,tcp:3389 --source-ranges=0.0.0.0/0
 
 List the firewall rules
-gcloud compute firewall-rules list --sort-by=NETWORK
+  gcloud compute firewall-rules list --sort-by=NETWORK
 
 Create a VM with a custom mode network and subnetwork
-gcloud compute --project=qwiklabs-gcp-04-3c5671ecc135 instances create privatenet-us-vm --zone=us-central1-c --machine-type=f1-micro --subnet=privatesubnet-us
---image=debian-9-stretch-v20200902 --image-project=debian-cloud --boot-disk-size=10GB 
---boot-disk-type=pd-standard --boot-disk-device-name=managementnet-us-vm --reservation-affinity=any
+  gcloud compute --project=qwiklabs-gcp-04-3c5671ecc135 instances create privatenet-us-vm --zone=us-central1-c --machine-type=f1-micro --subnet=privatesubnet-us
+  --image=debian-9-stretch-v20200902 --image-project=debian-cloud --boot-disk-size=10GB 
+  --boot-disk-type=pd-standard --boot-disk-device-name=managementnet-us-vm --reservation-affinity=any
 
